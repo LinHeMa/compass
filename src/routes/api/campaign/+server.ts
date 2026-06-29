@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { supabase } from '$lib/supabase';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
@@ -17,6 +18,13 @@ export const POST: RequestHandler = async ({ request }) => {
 			.split('\n')
 			.map((email: string) => email.trim())
 			.filter((email: string) => email.length > 0);
+
+		const { error } = await supabase.from('campaigns').insert({
+			name: campaignName,
+			emails_count: emailArray.length
+		});
+
+		if (error) throw error;
 
 		return json({
 			success: true,

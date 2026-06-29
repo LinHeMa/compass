@@ -1,0 +1,15 @@
+import { supabase } from '$lib/supabase';
+import type { PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async () => {
+	const { data: campaignData, error } = await supabase
+		.from('campaigns')
+		.select('*')
+		.order('created_at', { ascending: false });
+
+	if (error) {
+		console.error('Supabase Fetch Error:', error);
+		return { campaigns: [] };
+	}
+	return { campaigns: campaignData || [] };
+};

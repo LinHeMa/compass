@@ -1,9 +1,10 @@
 <script lang="ts">
+	let { data } = $props();
+
 	let campaignName = '';
 	let targetEmails = '';
 	let isLoading = false;
 	let message = '';
-
 	async function handleLaunch() {
 		if (!campaignName || !targetEmails) {
 			alert('please fill the campaign name and emails');
@@ -147,34 +148,31 @@
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-slate-100">
-							<tr class="hover:bg-slate-50/80 transition-colors">
-								<td class="px-4 py-4">
-									<p class="font-semibold text-slate-800">Q2 Payroll Slip Scam</p>
-									<p class="text-xs text-slate-400 mt-0.5">Launched: 2 hours ago</p>
-								</td>
-								<td class="px-4 py-4 text-slate-700 font-medium">45</td>
-								<td class="px-4 py-4 text-rose-600 font-medium">12</td>
-								<td class="px-4 py-4">
-									<span
-										class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-100"
-										>26.6%</span
+							{#each data.campaigns as campaign (campaign.id)}
+								<tr class="hover:bg-slate-50/80 transition-colors">
+									<td class="px-4 py-4">
+										<p class="font-semibold text-slate-800">{campaign.name}</p>
+										<p class="text-xs text-slate-400 mt-0.5">
+											Launched: {new Date(campaign.created_at).toLocaleDateString()}
+										</p>
+									</td>
+									<td class="px-4 py-4 text-slate-700 font-medium">{campaign.emails_count}</td>
+									<td class="px-4 py-4 text-rose-600 font-medium">0</td>
+									<!-- TODO: rate wait for Queue -->
+									<td class="px-4 py-4">
+										<span
+											class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200"
+											>0.0%</span
+										>
+									</td>
+								</tr>
+							{:else}
+								<tr>
+									<td colspan="4" class="px-4 py-8 text-center text-slate-400"
+										>No campaigns launched yet.</td
 									>
-								</td>
-							</tr>
-							<tr class="hover:bg-slate-50/80 transition-colors">
-								<td class="px-4 py-4">
-									<p class="font-semibold text-slate-800">IT Urgent Password Reset</p>
-									<p class="text-xs text-slate-400 mt-0.5">Launched: 3 days ago</p>
-								</td>
-								<td class="px-4 py-4 text-slate-700 font-medium">50</td>
-								<td class="px-4 py-4 text-amber-600 font-medium">4</td>
-								<td class="px-4 py-4">
-									<span
-										class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-100"
-										>8.0%</span
-									>
-								</td>
-							</tr>
+								</tr>
+							{/each}
 						</tbody>
 					</table>
 				</div>
