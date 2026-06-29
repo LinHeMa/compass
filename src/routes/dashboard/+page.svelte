@@ -1,4 +1,42 @@
 <script lang="ts">
+	let campaignName = '';
+	let targetEmails = '';
+	let isLoading = false;
+	let message = '';
+
+	async function handleLaunch() {
+		if (!campaignName || !targetEmails) {
+			alert('please fill the campaign name and emails');
+			return;
+		}
+
+		isLoading = true;
+		message = 'Launching campaign...';
+
+		try {
+			const response = await fetch('/api/campaign', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ campaignName, targetEmails })
+			});
+			const result = await response.json();
+
+			if (result.success) {
+				message = `🚀 Success! Queued ${result.processedCount} emails for simulation.`;
+				// 清空表單
+				campaignName = '';
+				targetEmails = '';
+			} else {
+				message = `❌ Failed: ${result.error}`;
+			}
+		} catch {
+			message = '❌ Network error occurred.';
+		} finally {
+			isLoading = false;
+		}
+	}
 </script>
 
 <div class="min-h-screen bg-slate-100 p-6 font-sans">
@@ -52,7 +90,7 @@
 					<span>🚀</span> Launch New Simulation
 				</h2>
 
-				<form class="space-y-4" on:submit|preventDefault>
+				<form class="space-y-4" onsubmit={handleLaunch}>
 					<div>
 						<label class="block text-sm font-medium text-slate-700 mb-1" for="name"
 							>Campaign Name</label
@@ -60,6 +98,7 @@
 						<input
 							type="text"
 							id="name"
+							bind:value={campaignName}
 							placeholder="e.g., 2026 Q2 Urgent Payroll Notice"
 							class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50"
 						/>
@@ -72,16 +111,20 @@
 						<textarea
 							id="targets"
 							rows="5"
+							bind:value={targetEmails}
 							placeholder="Enter emails, one per line&#10;employee1@company.com.au&#10;employee2@company.com.au"
-							class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 font-mono text-xs"
+							class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 font-mono"
 						></textarea>
 					</div>
-
+					{#if message}
+						<p class="text-xs font-medium text-blue-600 bg-blue-50 p-2 rounded-lg">{message}</p>
+					{/if}
 					<button
 						type="submit"
+						disabled={isLoading}
 						class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg text-sm transition-colors shadow-sm"
 					>
-						Queue & Launch Campaign
+						{isLoading ? 'Queuing...' : 'Queue & Launch Campaign'}
 					</button>
 				</form>
 			</div>
